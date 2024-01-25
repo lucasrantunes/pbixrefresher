@@ -1,4 +1,4 @@
-Power BI Refresher 2020
+Power BI Refresher 2024
 ======
 Script for automation of refreshing Power BI Desktop workbooks. Edited on Python 3.8 with pywinauto, pyautogui.
 
