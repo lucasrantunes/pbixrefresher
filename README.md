@@ -1,5 +1,7 @@
 Power BI Refresher 2024
 ======
+**To see the changes of this fork just give a look at the pbixrefresher.py file.**
+
 Script for automation of refreshing Power BI Desktop workbooks. Edited on Python 3.11 with pywinauto.
 
 Added compatibility to PowerBI Version 2.121.903.0 (Jan 2024) on Windows 10 with English/Portuguese(Brazil) locales.
