@@ -3,9 +3,9 @@ import os
 import sys
 import argparse
 import psutil
-import pyautogui
 from pywinauto.application import Application
 from pywinauto import timings
+from time import sleep
 
 def main():   
 	# Parse arguments from cmd
@@ -14,14 +14,12 @@ def main():
 	parser.add_argument("--workspace", help = "name of online Power BI service work space to publish in", default = "My workspace")
 	parser.add_argument("--refresh-timeout", help = "refresh timeout", default = 30000, type = int)
 	parser.add_argument("--no-publish", dest='publish', help="don't publish, just save", default = True, action = 'store_false' )
-	parser.add_argument("--init-wait", help = "initial wait time on startup", default = 60, type = int)
 	args = parser.parse_args()
 
 	timings.after_clickinput_wait = 1
 	WORKBOOK = args.workbook
-	WORKSPACE = args.workspace
-	INIT_WAIT = args.init_wait
-	REFRESH_TIMEOUT = args.refresh_timeout
+	WORKSPACE = args.workspace.replace(" ", "{SPACE}") # Replace space by the equivalent key code
+	WAIT_TIMEOUT = args.refresh_timeout
 
 	# Kill running PBI
 	PROCNAME = "PBIDesktop.exe"
@@ -34,40 +32,34 @@ def main():
 	# Start PBI and open the workbook
 	print("Starting Power BI")
 	os.system('start "" "' + WORKBOOK + '"')
-	print("Waiting ",INIT_WAIT,"sec")
-	time.sleep(INIT_WAIT)
+	sleep(1)
 
 	# Connect pywinauto
 	print("Identifying Power BI window")
 	app = Application(backend = 'uia').connect(path = PROCNAME)
 	win = app.window(title_re = '.*Power BI Desktop')
-	time.sleep(5)
-	win.set_focus()
+	timings.after_clickinput_wait = 1
 	
-	# Refresh
-	print("Refreshing")
-	win.Refresh.click_input()
-	win.wait("enabled", timeout = 300)
-	time.sleep(5)
-	print("Waiting for refresh end (timeout in ", REFRESH_TIMEOUT,"sec)")
-	win.wait("enabled", timeout = REFRESH_TIMEOUT)
-
 	# Publish
-	if args.publish:
-		print("Save and Publish")
-		win.Publish.click_input()
-		time.sleep(10)
-		save_dialog = win.child_window(auto_id = "modalDialog")
-		save_dialog.Save.click_input()
-		time.sleep(10)
-		publish_dialog = win.child_window(auto_id = "KoPublishToGroupDialog")
-		publish_dialog.child_window(title = WORKSPACE, found_index=1).click_input()
-		time.sleep(10)
-		publish_dialog.Select.click_input()
-		time.sleep(10)
-		replace_dialog = win.child_window(auto_id = "KoPublishWithImpactViewDialog")
-		replace_dialog.Replace.click_input()
-		time.sleep(300)
+	print("Waiting Power BI to load")
+	publish = win.child_window(title="Publish", control_type='Button', found_index=0).wait('visible', timeout=WAIT_TIMEOUT)
+	print("Publishing workbook")
+	publish.click()
+
+	publish_dialog = win.child_window(auto_id = "KoPublishToGroupDialog")
+	publish_dialog.wait('visible', timeout = WAIT_TIMEOUT)
+
+	print("Selecting workspace")
+	publish_dialog.child_window(title = "Search", control_type="Edit").type_keys(WORKSPACE)
+	publish_dialog.Select.click()
+
+	print("Waiting replace screen")
+	replace = win.child_window(title="Replace", control_type='Button').wait('visible', timeout=WAIT_TIMEOUT)
+	replace.click()
+
+	print("Waiting success screen")
+	got_it = win.child_window(title="Got it", control_type='Button').wait('visible', timeout=WAIT_TIMEOUT)
+	got_it.click()
 		
 	#Close
 	print("Exiting")
