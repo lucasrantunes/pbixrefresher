@@ -1,8 +1,8 @@
 Power BI Refresher 2024
 ======
-Script for automation of refreshing Power BI Desktop workbooks. Edited on Python 3.8 with pywinauto, pyautogui.
+Script for automation of refreshing Power BI Desktop workbooks. Edited on Python 3.11 with pywinauto.
 
-Added compatibility to PowerBI Version 2.84.981.0 (August 2020) on Windows 10 with English/Portuguese(Brazil) locales.
+Added compatibility to PowerBI Version 2.121.903.0 (Jan 2024) on Windows 10 with English/Portuguese(Brazil) locales.
 
 *This script originaly is not mine (original post bellow), I just updated it to make it run on the latest version of PowerBI.*
 
@@ -13,6 +13,7 @@ https://github.com/dubravcik/pbixrefresher-python (Original Script)
 https://github.com/LevonPython/PbiRefresher
 https://github.com/pywinauto/pywinauto/issues/943 
 https://stackoverflow.com/questions/15887729/can-the-gui-of-an-rdp-session-remain-active-after-disconnect
+https://github.com/DarknessTech/pbixrefresher2020/blob/master/pbixrefresher.py
 ```
 Installation
 ------
